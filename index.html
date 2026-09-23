@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Battleship — Set Sail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="paper-texture" aria-hidden="true"></div>
+
+<div class="decor decor-anchor-left" aria-hidden="true">
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="12" r="6" stroke="currentColor" stroke-width="3"/>
+    <line x1="32" y1="18" x2="32" y2="52" stroke="currentColor" stroke-width="3"/>
+    <line x1="18" y1="26" x2="46" y2="26" stroke="currentColor" stroke-width="3"/>
+    <path d="M10 34C10 46 20 54 32 56C44 54 54 46 54 34" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</div>
+<div class="decor decor-anchor-right" aria-hidden="true">
+  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="32" cy="12" r="6" stroke="currentColor" stroke-width="3"/>
+    <line x1="32" y1="18" x2="32" y2="52" stroke="currentColor" stroke-width="3"/>
+    <line x1="18" y1="26" x2="46" y2="26" stroke="currentColor" stroke-width="3"/>
+    <path d="M10 34C10 46 20 54 32 56C44 54 54 46 54 34" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<main class="app">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="header">
+    <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="true" aria-label="Toggle sound effects">
+      <span class="sound-icon" aria-hidden="true">🔊</span>
+      <span class="sound-label">SOUND ON</span>
+    </button>
+
+    <div class="title-wrap">
+      <svg class="title-ship" viewBox="0 0 200 90" aria-hidden="true">
+        <path d="M20 55 L35 30 L165 30 L180 55 L160 68 L40 68 Z" fill="#795548"/>
+        <rect x="90" y="8" width="8" height="24" fill="#795548"/>
+        <rect x="70" y="18" width="46" height="14" rx="2" fill="#6b4a3f"/>
+        <path d="M10 62 Q100 82 190 62 L190 66 Q100 86 10 66 Z" fill="#E9BFC4"/>
+        <circle cx="60" cy="49" r="3" fill="#F7DDE0"/>
+        <circle cx="80" cy="49" r="3" fill="#F7DDE0"/>
+        <circle cx="100" cy="49" r="3" fill="#F7DDE0"/>
+        <circle cx="120" cy="49" r="3" fill="#F7DDE0"/>
+        <circle cx="140" cy="49" r="3" fill="#F7DDE0"/>
+      </svg>
+      <h1 class="title">Battleship</h1>
+      <p class="subtitle">Set sail. Find the fleet. Sink the ships.</p>
+    </div>
+
+    <button id="newGameBtn" class="btn btn-primary header-new-game" type="button">New Game</button>
+  </header>
+
+  <!-- ===================== STATUS BAR ===================== -->
+  <section class="status-bar" aria-live="polite">
+    <div class="status-side">
+      <span class="status-label">Player</span>
+      <span class="status-value" id="playerHits">0 hits</span>
+    </div>
+
+    <div class="status-turn">
+      <div class="turn-indicator your-turn" id="turnIndicator">
+        <span class="turn-main" id="turnMain">Your Turn</span>
+        <span class="turn-sub" id="turnSub">Choose a target to attack</span>
+      </div>
+    </div>
+
+    <div class="status-side">
+      <span class="status-label">Computer</span>
+      <span class="status-value" id="enemyHits">0 hits</span>
+    </div>
+  </section>
+
+  <!-- ===================== BOARDS ===================== -->
+  <section class="boards">
+
+    <div class="board-panel">
+      <h2 class="board-title">
+        <svg class="board-title-icon" viewBox="0 0 60 30" aria-hidden="true">
+          <path d="M4 18 L12 8 L48 8 L56 18 L50 24 L10 24 Z" fill="#795548"/>
+          <rect x="27" y="2" width="4" height="8" fill="#795548"/>
+        </svg>
+        Your Fleet
+      </h2>
+      <div class="board-frame">
+        <div class="board" id="playerBoard" role="grid" aria-label="Your fleet board"></div>
+      </div>
+    </div>
+
+    <div class="board-panel">
+      <h2 class="board-title">
+        <svg class="board-title-icon" viewBox="0 0 60 30" aria-hidden="true">
+          <path d="M4 18 L12 8 L48 8 L56 18 L50 24 L10 24 Z" fill="#C96A63"/>
+          <rect x="27" y="2" width="4" height="8" fill="#C96A63"/>
+        </svg>
+        Enemy Waters
+      </h2>
+      <div class="board-frame">
+        <div class="board" id="enemyBoard" role="grid" aria-label="Enemy waters board — click a cell to attack"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== LEGEND ===================== -->
+  <section class="legend" aria-hidden="true">
+    <span class="legend-item"><span class="legend-swatch legend-hit"></span> Hit</span>
+    <span class="legend-item"><span class="legend-swatch legend-miss"></span> Miss</span>
+  </section>
+
+  <!-- ===================== FLEET STATUS ===================== -->
+  <section class="fleets">
+    <div class="fleet-panel">
+      <h3 class="fleet-title">Your Fleet</h3>
+      <ul class="fleet-list" id="playerFleetList"></ul>
+    </div>
+    <div class="fleet-panel">
+      <h3 class="fleet-title">Enemy Fleet</h3>
+      <ul class="fleet-list" id="enemyFleetList"></ul>
+    </div>
+  </section>
+
+  <!-- ===================== INSTRUCTIONS ===================== -->
+  <section class="instructions">
+    <p>Click a cell on <strong>Enemy Waters</strong> to fire. Sink every enemy ship before the computer sinks yours. Ships are placed automatically when a new game begins.</p>
+  </section>
+
+  <footer class="footer">
+    <p>A cozy redesign of the classic Battleship game — vanilla HTML, CSS &amp; JavaScript.</p>
+  </footer>
+
+</main>
+
+<!-- ===================== GAME OVER MODAL ===================== -->
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <svg class="modal-ship" viewBox="0 0 200 90" aria-hidden="true">
+      <path d="M20 55 L35 30 L165 30 L180 55 L160 68 L40 68 Z" fill="#795548"/>
+      <rect x="90" y="8" width="8" height="24" fill="#795548"/>
+      <rect x="70" y="18" width="46" height="14" rx="2" fill="#6b4a3f"/>
+      <path d="M10 62 Q100 82 190 62 L190 66 Q100 86 10 66 Z" fill="#E9BFC4"/>
+    </svg>
+    <h2 class="modal-title" id="modalTitle">Victory!</h2>
+    <p class="modal-text" id="modalText">All enemy ships have been sunk.</p>
+    <button class="btn btn-primary modal-btn" id="modalRestartBtn" type="button">Play Again</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

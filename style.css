@@ -1,0 +1,835 @@
+/* =========================================================
+   BATTLESHIP — pastel pink & warm brown, vintage nautical
+   ========================================================= */
+
+:root {
+  --bg: #FFF8F7;
+  --pink: #F4D6D8;
+  --board-pink: #F7DDE0;
+  --pink-dark: #E9BFC4;
+  --brown: #795548;
+  --brown-dark: #4A332D;
+  --cream: #FFF9F0;
+  --beige: #EADDD3;
+  --accent-hit: #C96A63;
+  --water: #EFD9DA;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-soft: 0 6px 18px rgba(74, 51, 45, 0.10);
+  --shadow-lift: 0 10px 28px rgba(74, 51, 45, 0.16);
+
+  --font-display: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Nunito Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--brown-dark);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* subtle paper texture, purely decorative */
+.paper-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(233, 191, 196, 0.25) 0, transparent 45%),
+    radial-gradient(circle at 85% 10%, rgba(244, 214, 216, 0.30) 0, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(234, 221, 211, 0.35) 0, transparent 45%);
+}
+
+.decor {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  color: var(--pink-dark);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+.decor svg { width: 100%; height: 100%; }
+.decor-anchor-left { top: 40px; left: 3vw; }
+.decor-anchor-right { bottom: 40px; right: 3vw; }
+@media (max-width: 900px) {
+  .decor { display: none; }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.title-wrap {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-ship {
+  width: 84px;
+  height: auto;
+  margin-bottom: 4px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  letter-spacing: 0.06em;
+  margin: 0;
+  color: var(--brown-dark);
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--brown);
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.sound-toggle,
+.header-new-game {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 22px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--accent-hit);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--brown);
+  color: var(--cream);
+}
+.btn-primary:hover {
+  background: var(--brown-dark);
+}
+
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--cream);
+  color: var(--brown-dark);
+  border: 1px solid var(--pink-dark);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.sound-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  background: var(--beige);
+}
+.sound-toggle:focus-visible {
+  outline: 3px solid var(--accent-hit);
+  outline-offset: 2px;
+}
+.sound-icon { font-size: 1rem; }
+
+/* =========================================================
+   STATUS BAR
+   ========================================================= */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cream);
+  border: 1px solid var(--beige);
+  border-radius: var(--radius-lg);
+  padding: 14px 26px;
+  margin-bottom: 26px;
+  box-shadow: var(--shadow-soft);
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.status-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brown);
+  font-weight: 700;
+}
+
+.status-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--brown-dark);
+}
+
+.status-turn {
+  flex: 1;
+  text-align: center;
+}
+
+.turn-indicator {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 220px;
+  background: var(--pink);
+  border: 1px solid var(--pink-dark);
+  padding: 9px 24px;
+  border-radius: var(--radius-md);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.turn-indicator .turn-main {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+  letter-spacing: 0.03em;
+}
+
+.turn-indicator .turn-sub {
+  font-size: 0.74rem;
+  color: var(--brown);
+  font-style: italic;
+}
+
+.turn-indicator.your-turn {
+  animation: turnPulse 2s ease-in-out infinite;
+}
+
+@keyframes turnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 191, 196, 0.55); }
+  50% { box-shadow: 0 0 0 9px rgba(233, 191, 196, 0); }
+}
+
+.turn-indicator.enemy-turn {
+  background: var(--pink-dark);
+  color: var(--brown-dark);
+  animation: none;
+}
+
+/* =========================================================
+   BOARDS
+   ========================================================= */
+
+.boards {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.board-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 380px;
+  max-width: 420px;
+}
+
+.board-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+  margin: 0 0 12px;
+  letter-spacing: 0.03em;
+}
+
+.board-title-icon {
+  width: 34px;
+  height: auto;
+}
+
+.board-frame {
+  background: var(--cream);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--beige);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 22px repeat(10, minmax(26px, 34px));
+  grid-template-rows: 22px repeat(10, minmax(26px, 34px));
+  gap: 3px;
+}
+
+.cell-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--brown);
+  user-select: none;
+}
+
+.cell {
+  position: relative;
+  z-index: 2;
+  background: var(--water);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(121, 85, 72, 0.18);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  overflow: visible;
+}
+
+.player-board .cell {
+  background: var(--board-pink);
+  cursor: default;
+}
+
+/* Ship hull silhouette — a single shape spanning a ship's cells,
+   placed on the same grid so it lines up exactly beneath them. */
+.ship-hull {
+  z-index: 1;
+  background: linear-gradient(160deg, var(--brown) 0%, #6b4a3f 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(74, 51, 45, 0.5);
+  filter: drop-shadow(0 1px 2px rgba(74, 51, 45, 0.25));
+  pointer-events: none;
+}
+.ship-hull.horizontal {
+  clip-path: polygon(0% 50%, 14% 18%, 86% 18%, 100% 50%, 86% 82%, 14% 82%);
+}
+.ship-hull.vertical {
+  clip-path: polygon(50% 0%, 82% 14%, 82% 86%, 50% 100%, 18% 86%, 18% 14%);
+}
+
+.enemy-board {
+  border-radius: var(--radius-sm);
+  transition: opacity 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 0 2px transparent;
+}
+.enemy-board:not(.disabled) {
+  box-shadow: 0 0 0 2px var(--pink-dark);
+}
+.enemy-board.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.enemy-board .cell {
+  cursor: pointer;
+}
+.enemy-board .cell:hover:not(.hit):not(.miss) {
+  background: var(--pink-dark);
+  transform: scale(1.08);
+  box-shadow: 0 3px 8px rgba(74, 51, 45, 0.2);
+}
+.enemy-board .cell:focus-visible {
+  outline: 2px solid var(--accent-hit);
+  outline-offset: 1px;
+}
+
+/* ship presence on player board — the cell itself stays transparent
+   AND borderless so the .ship-hull shape beneath it reads as one
+   continuous vessel instead of a row of separate bordered squares */
+.cell.ship {
+  background: transparent;
+  border-color: transparent;
+}
+.cell.ship.hit {
+  /* a translucent damage tint over the hull, rather than hiding it */
+  background: rgba(74, 51, 45, 0.58);
+}
+
+/* ===== MISS — clearly distinct tint + a solid mark + a transient ripple.
+   Deliberately different from a HIT (color, shape and darkness) so a
+   miss is never confused with an unattacked cell or a hit. ===== */
+.cell.miss {
+  background: var(--beige);
+}
+.cell.miss::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--brown);
+  opacity: 0.75;
+  transform: translate(-50%, -50%);
+}
+.cell.miss::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: 40%;
+  border: 2px solid var(--brown);
+  border-radius: 50%;
+  opacity: 0.6;
+  transform: translate(-50%, -50%) scale(0.2);
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes ripple {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+}
+
+/* ===== HIT — strong terracotta mark that stays after the explosion fades ===== */
+.cell.hit:not(.ship) {
+  background: var(--accent-hit);
+}
+.cell.hit::before {
+  content: "✕";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--cream);
+}
+
+.cell.sunk {
+  background: var(--brown-dark) !important;
+}
+
+/* fade-in for ships appearing at game start */
+.cell.ship-appear {
+  animation: shipAppear 0.4s ease both;
+}
+@keyframes shipAppear {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* =========================================================
+   EXPLOSION ANIMATION
+   ========================================================= */
+
+.explosion {
+  position: absolute;
+  inset: -60%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.explosion .shockwave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  border: 2px solid var(--accent-hit);
+  transform: translate(-50%, -50%) scale(0.3);
+  opacity: 0.9;
+  animation: shockwave 0.6s ease-out forwards;
+}
+
+@keyframes shockwave {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(3.2); opacity: 0; }
+}
+
+.explosion .glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 150, 0.95) 0%, rgba(201, 106, 99, 0.7) 45%, rgba(201, 106, 99, 0) 75%);
+  transform: translate(-50%, -50%) scale(0.4);
+  animation: glowPulse 0.55s ease-out forwards;
+}
+
+@keyframes glowPulse {
+  0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+  60% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.explosion .particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brown);
+  opacity: 0.95;
+  animation: particleFly 0.7s ease-out forwards;
+}
+
+@keyframes particleFly {
+  0% { transform: translate(-50%, -50%) translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+}
+
+.explosion .smoke {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 45%;
+  height: 45%;
+  border-radius: 50%;
+  background: rgba(120, 100, 90, 0.35);
+  transform: translate(-50%, -50%) scale(0.5);
+  animation: smokeFade 0.9s ease-out forwards;
+}
+
+@keyframes smokeFade {
+  0% { transform: translate(-50%, -80%) scale(0.4); opacity: 0.6; }
+  100% { transform: translate(-50%, -140%) scale(1.3); opacity: 0; }
+}
+
+/* =========================================================
+   SUNK MESSAGE TOAST
+   ========================================================= */
+
+.toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--cream);
+  border: 1px solid var(--pink-dark);
+  color: var(--brown-dark);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-lift);
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* =========================================================
+   LEGEND
+   ========================================================= */
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin: 0 auto 22px;
+  color: var(--brown);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-swatch {
+  position: relative;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-hit {
+  background: var(--accent-hit);
+}
+.legend-hit::after {
+  content: "✕";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: var(--cream);
+}
+
+.legend-miss {
+  background: var(--beige);
+  border: 1px solid var(--pink-dark);
+}
+.legend-miss::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: var(--brown);
+  transform: translate(-50%, -50%);
+}
+
+/* =========================================================
+   FLEET STATUS PANELS
+   ========================================================= */
+
+.fleets {
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.fleet-panel {
+  background: var(--cream);
+  border: 1px solid var(--beige);
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  box-shadow: var(--shadow-soft);
+  flex: 1 1 380px;
+  max-width: 420px;
+}
+
+.fleet-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--brown-dark);
+  border-bottom: 1px solid var(--beige);
+  padding-bottom: 8px;
+}
+
+.fleet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fleet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--brown-dark);
+  transition: opacity 0.4s ease;
+}
+
+.fleet-item-icon {
+  width: 30px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.fleet-item-icon svg { width: 100%; height: 100%; }
+
+.fleet-item-name {
+  flex: 1;
+}
+
+.fleet-item-status {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--brown);
+}
+
+.fleet-item.sunk {
+  opacity: 0.45;
+}
+.fleet-item.sunk .fleet-item-name {
+  text-decoration: line-through;
+}
+.fleet-item.sunk .fleet-item-status {
+  color: var(--accent-hit);
+}
+
+/* =========================================================
+   INSTRUCTIONS / FOOTER
+   ========================================================= */
+
+.instructions {
+  max-width: 640px;
+  margin: 0 auto 18px;
+  text-align: center;
+  color: var(--brown);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--pink-dark);
+  margin-top: 10px;
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 51, 45, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+.modal-overlay[hidden] { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--cream);
+  border-radius: var(--radius-lg);
+  padding: 34px 40px;
+  text-align: center;
+  max-width: 380px;
+  width: calc(100% - 40px);
+  box-shadow: var(--shadow-lift);
+  border: 1px solid var(--pink-dark);
+  animation: modalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.85) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-ship {
+  width: 100px;
+  margin: 0 auto 10px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin: 0 0 8px;
+  color: var(--brown-dark);
+}
+
+.modal-text {
+  margin: 0 0 22px;
+  color: var(--brown);
+  font-size: 0.95rem;
+}
+
+.modal-btn {
+  width: 100%;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .boards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .board {
+    grid-template-columns: 18px repeat(10, minmax(22px, 30px));
+    grid-template-rows: 18px repeat(10, minmax(22px, 30px));
+  }
+  .status-bar {
+    flex-direction: column;
+  }
+  .status-turn { order: -1; }
+}
+
+@media (max-width: 420px) {
+  .board {
+    grid-template-columns: 16px repeat(10, minmax(18px, 24px));
+    grid-template-rows: 16px repeat(10, minmax(18px, 24px));
+    gap: 2px;
+  }
+  .title { font-size: 2.2rem; }
+}
+
+/* respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
