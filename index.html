@@ -58,10 +58,28 @@
     <button id="newGameBtn" class="btn btn-primary header-new-game" type="button">New Game</button>
   </header>
 
+  <!-- ===================== GAME SETUP ===================== -->
+  <section class="setup-bar" id="setupBar" aria-label="Game setup">
+    <div class="setup-group">
+      <span class="setup-label">Mode</span>
+      <div class="setup-options" role="radiogroup" aria-label="Game mode">
+        <button type="button" class="setup-btn active" data-mode="cpu">vs Computer</button>
+        <button type="button" class="setup-btn" data-mode="pvp">vs Friend (2 Players)</button>
+      </div>
+    </div>
+    <div class="setup-group">
+      <span class="setup-label">Ship Placement</span>
+      <div class="setup-options" role="radiogroup" aria-label="Ship placement mode">
+        <button type="button" class="setup-btn active" data-placement="auto">Random</button>
+        <button type="button" class="setup-btn" data-placement="manual">Manual</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== STATUS BAR ===================== -->
   <section class="status-bar" aria-live="polite">
     <div class="status-side">
-      <span class="status-label">Player</span>
+      <span class="status-label" id="player0Label">Player</span>
       <span class="status-value" id="playerHits">0 hits</span>
     </div>
 
@@ -73,8 +91,21 @@
     </div>
 
     <div class="status-side">
-      <span class="status-label">Computer</span>
+      <span class="status-label" id="player1Label">Computer</span>
       <span class="status-value" id="enemyHits">0 hits</span>
+    </div>
+  </section>
+
+  <!-- ===================== PLACEMENT PANEL (manual mode only) ===================== -->
+  <section class="placement-panel" id="placementPanel" hidden>
+    <div class="placement-info">
+      <span class="placement-title" id="placementTitle">Place your Carrier (5 cells)</span>
+      <span class="placement-sub" id="placementSub">Click a cell on your board. Use Rotate to change direction.</span>
+    </div>
+    <div class="placement-controls">
+      <button type="button" class="btn btn-secondary" id="rotateBtn">⤾ Rotate</button>
+      <button type="button" class="btn btn-secondary" id="randomizeBtn">🎲 Randomize</button>
+      <button type="button" class="btn btn-primary" id="finishPlacementBtn" disabled>Start Battle</button>
     </div>
   </section>
 
@@ -87,7 +118,7 @@
           <path d="M4 18 L12 8 L48 8 L56 18 L50 24 L10 24 Z" fill="#795548"/>
           <rect x="27" y="2" width="4" height="8" fill="#795548"/>
         </svg>
-        Your Fleet
+        <span id="leftBoardTitle">Your Fleet</span>
       </h2>
       <div class="board-frame">
         <div class="board" id="playerBoard" role="grid" aria-label="Your fleet board"></div>
@@ -100,7 +131,7 @@
           <path d="M4 18 L12 8 L48 8 L56 18 L50 24 L10 24 Z" fill="#C96A63"/>
           <rect x="27" y="2" width="4" height="8" fill="#C96A63"/>
         </svg>
-        Enemy Waters
+        <span id="rightBoardTitle">Enemy Waters</span>
       </h2>
       <div class="board-frame">
         <div class="board" id="enemyBoard" role="grid" aria-label="Enemy waters board — click a cell to attack"></div>
@@ -118,18 +149,18 @@
   <!-- ===================== FLEET STATUS ===================== -->
   <section class="fleets">
     <div class="fleet-panel">
-      <h3 class="fleet-title">Your Fleet</h3>
+      <h3 class="fleet-title" id="leftFleetTitle">Your Fleet</h3>
       <ul class="fleet-list" id="playerFleetList"></ul>
     </div>
     <div class="fleet-panel">
-      <h3 class="fleet-title">Enemy Fleet</h3>
+      <h3 class="fleet-title" id="rightFleetTitle">Enemy Fleet</h3>
       <ul class="fleet-list" id="enemyFleetList"></ul>
     </div>
   </section>
 
   <!-- ===================== INSTRUCTIONS ===================== -->
   <section class="instructions">
-    <p>Click a cell on <strong>Enemy Waters</strong> to fire. Sink every enemy ship before the computer sinks yours. Ships are placed automatically when a new game begins.</p>
+    <p>Choose a mode and placement style above, then click <strong>New Game</strong>. In <strong>Manual</strong> placement, click your own board to place each ship (Rotate to change direction). In <strong>vs Friend</strong> mode, a "Pass the Device" screen keeps each player's fleet hidden from the other. During battle, click <strong>Enemy Waters</strong> to fire — sink every ship to win.</p>
   </section>
 
   <footer class="footer">
@@ -138,7 +169,7 @@
 
 </main>
 
-<!-- ===================== GAME OVER MODAL ===================== -->
+<!-- ===================== GENERIC MODAL (Game Over / Pass the Device) ===================== -->
 <div class="modal-overlay" id="modalOverlay" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <svg class="modal-ship" viewBox="0 0 200 90" aria-hidden="true">
@@ -149,7 +180,7 @@
     </svg>
     <h2 class="modal-title" id="modalTitle">Victory!</h2>
     <p class="modal-text" id="modalText">All enemy ships have been sunk.</p>
-    <button class="btn btn-primary modal-btn" id="modalRestartBtn" type="button">Play Again</button>
+    <button class="btn btn-primary modal-btn" id="modalActionBtn" type="button">Play Again</button>
   </div>
 </div>
 

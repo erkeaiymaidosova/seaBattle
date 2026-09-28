@@ -156,6 +156,141 @@ html, body {
   background: var(--brown-dark);
 }
 
+.btn-secondary {
+  background: var(--pink);
+  color: var(--brown-dark);
+  border: 1px solid var(--pink-dark);
+}
+.btn-secondary:hover {
+  background: var(--pink-dark);
+}
+
+.btn:disabled,
+.btn:disabled:hover {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow-soft);
+}
+
+/* =========================================================
+   SETUP BAR (mode + placement style)
+   ========================================================= */
+
+.setup-bar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin: 0 auto 22px;
+}
+
+.setup-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.setup-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brown);
+}
+
+.setup-options {
+  display: inline-flex;
+  background: var(--cream);
+  border: 1px solid var(--beige);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 3px;
+  box-shadow: var(--shadow-soft);
+}
+
+.setup-btn {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: none;
+  background: transparent;
+  color: var(--brown);
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.setup-btn:hover {
+  background: var(--pink);
+}
+.setup-btn.active {
+  background: var(--brown);
+  color: var(--cream);
+}
+.setup-btn:focus-visible {
+  outline: 2px solid var(--accent-hit);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   PLACEMENT PANEL (manual ship placement)
+   ========================================================= */
+
+.placement-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  background: var(--cream);
+  border: 1px solid var(--pink-dark);
+  border-radius: var(--radius-lg);
+  padding: 16px 24px;
+  margin: 0 auto 26px;
+  max-width: 900px;
+  box-shadow: var(--shadow-soft);
+}
+
+.placement-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.placement-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+}
+
+.placement-sub {
+  font-size: 0.8rem;
+  color: var(--brown);
+  font-style: italic;
+}
+
+.placement-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.placement-controls .btn {
+  padding: 9px 16px;
+  font-size: 0.8rem;
+}
+
+/* Hover preview while manually placing a ship */
+.cell.preview-valid {
+  background: rgba(121, 85, 72, 0.35) !important;
+}
+.cell.preview-invalid {
+  background: rgba(201, 106, 99, 0.4) !important;
+}
+
 .sound-toggle {
   display: inline-flex;
   align-items: center;
